@@ -44,26 +44,39 @@ namespace Lab5
             return sum;
         }
 
-        private static int[] Eratosphen(int n)
+        private static (int prev, int next) Twins(int A, int B)
         {
-            int[] a = new int[n + 1];
+            int[] a = new int[B + 1];
             int countSimple = 0;
-            int[] ans = new int[n/2];
-            for (int i = 0; i < n + 1; i++)
+            int[] ans = new int[B/2];
+            for (int i = 0; i < B + 1; i++)
                 a[i] = i;
-            for (int p = 2; p < n + 1; p++)
+
+            for (int j = 4; j < B + 1; j += 2)
+                a[j] = 0;
+            ans[countSimple] = 0;
+            countSimple++;
+
+            for (int p = 3; p < B + 1; p++)
             {
                 if (a[p] != 0)
                 {
+
                     ans[countSimple] = a[p];
+                    if (ans[countSimple] - ans[countSimple - 1] == 2 && ans[countSimple - 1] >= A)
+                        return (prev: p - 2, next: p);
+
                     countSimple++;
-                    for (int j = p * p; j < n + 1; j += p)
+                    for (int j = p * p; j < B + 1; j += p)
                         a[j] = 0;
+
+
                 }
+                
+
             }
 
-            Array.Resize(ref ans, countSimple);
-            return ans;
+            return (prev: -1, next: -1);
         }
 
         private static int[] GetNumber(String num)
@@ -98,26 +111,26 @@ namespace Lab5
             Console.WriteLine("Нельзя представить в виде послдедовательности натуральных чисел");
         }
 
-        public static void PrintAlphabet(int n, int cur = 0, in String alf = "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        public static void PrintAlphabet(int n, int cur = 0, in char alf = 'A', in int sizeAlfabet = 26)
         {
             for (int i = 0; i < cur; i++)
                 Console.Write(" ");
 
-            for (int i = cur; i < (26 - cur); i++)
-                Console.Write(alf[i]);
+            for (int i = cur; i < (sizeAlfabet - cur); i++)
+                Console.Write((char)(alf + i));
 
             Console.WriteLine();
 
-            if (26 - cur*2 > n)
+            if (sizeAlfabet - cur*2 > n)
                 PrintAlphabet(n, cur + 1, alf);
 
-            if (26 - cur * 2 != n)
+            if (sizeAlfabet - cur * 2 != n)
             {
                 for (int i = 0; i < cur; i++)
                     Console.Write(" ");
 
-                for (int i = cur; i < 26 - cur; i++)
-                    Console.Write(alf[i]);
+                for (int i = cur; i < sizeAlfabet - cur; i++)
+                    Console.Write((char)(alf + i));
 
                 Console.WriteLine();
             }
@@ -227,7 +240,7 @@ namespace Lab5
                             break;
                         }
 
-                    case (int)task.twinsNumber:
+                    case (int)task.twinsNumber://////////////////////////////////
                         {
                             Console.WriteLine("Введите число");
                             int a = -1;
@@ -236,19 +249,22 @@ namespace Lab5
 
                             Console.WriteLine("Числа близнецы:");
 
-                            int[] simplesNum = Eratosphen(2 * a);
-                            int indA = Array.FindIndex(simplesNum, (x => x >= a));
-                            for (int i = indA + 1; i <= 2 * a; i++)
-                                if (simplesNum[i] - simplesNum[i - 1] == 2)
-                                    Console.WriteLine(simplesNum[i] + " " + simplesNum[i - 1]);
+                            var pair = Twins(a, 2 * a);
+
+                            if (pair.prev != -1)
+                                Console.WriteLine(pair.next + "/" + pair.prev);
+                            else
+                                Console.WriteLine("Нет близнецов");
 
                             break;
                         }
                     case (int)task.alphabet:
                         {
+                            ///////////////////////
+                            const int sizeAlfabet = 26;
                             Console.WriteLine("Введите число");
                             int a = -1;
-                            while (!int.TryParse(Console.ReadLine(), out a) || a <= 0 || a > 26)
+                            while (!int.TryParse(Console.ReadLine(), out a) || a <= 0 || a > sizeAlfabet)
                                 Console.WriteLine("Неверный ввод числа");
 
                             PrintAlphabet(a);
